@@ -1,4 +1,3 @@
-poj
-===
+PKU JudgeOnline
 
-poj
+alias go='cat in.txt | ./a.out'
