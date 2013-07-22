@@ -4,36 +4,6 @@
 
 using namespace std;
 
-int getdata(vector<pair<int, int> > &buffer, int n, int index);
-int getmax2(vector<pair<int, int> > &buffer, int n, int sum, int index);
-
-
-void debug_p_pairs(vector<pair<int, int> > &buffer, int n)
-{
-	cout<<n<<endl;
-	int ix = 0;
-	for(ix = 0; ix != buffer.size(); ++ix)
-	{
-		cout<<buffer[ix].first<<" "<<buffer[ix].second<<endl;
-	}
-}
-
-void debug_p_bitmap(vector<pair<int, int> > &buffer, int n, int sum)
-{
-	for(int i =0;i<sum;i++)
-	{
-		cout<<getdata(buffer, n, i)<<" ";
-		if((i+1)%n == 0)
-			cout<<endl;
-	}
-	for(int i =0;i<sum;i++)
-	{
-		cout<<getmax2(buffer, n, sum, i)<<" ";
-		if((i+1)%n == 0)
-			cout<<endl;
-	}
-}
-
 
 int getdata(vector<pair<int, int> > &buffer, int n, int index)
 {
@@ -50,7 +20,6 @@ int getdata(vector<pair<int, int> > &buffer, int n, int index)
 
 int getmax2(vector<pair<int, int> > &buffer, int n, int sum, int index)
 {
-	//return 0;  //still timeout???
 	int max = 0;
 	int top = index, pre = index, next = index, bom = index;
 	int toppre = index, topnext = index, bompre = index, bomnext = index;
@@ -132,22 +101,45 @@ int getmax2(vector<pair<int, int> > &buffer, int n, int sum, int index)
 	return max;
 }
 
-void deal_pairs(vector<pair<int, int> > &buffer, int n, int sum)
+
+void add_res(vector<pair<int, int> > &res, int num, int nums)
+{
+	if(res.size() == 0)
+	{
+		res.push_back(make_pair(num,nums));
+		return;
+	}
+	if(res[res.size()-1].first == num)
+		res[res.size()-1].second += nums;
+	else
+		res.push_back(make_pair(num,nums));
+}
+
+void print_res(vector<pair<int, int> > &res)
+{
+	for(vector<pair<int, int> >::size_type ix = 0; ix != res.size(); ++ix)
+		cout<<res[ix].first<<" "<<res[ix].second<<endl;
+}
+
+
+void deal_pairs(vector<pair<int, int> > &buffer, vector<pair<int, int> > &res, int n, int sum)
 {
 	int t_index = 0;
 	int num = 0;
 	int pre_num = getmax2(buffer, n, sum, 0);
 	int nums = 0;
+
+	int flag = 0;
+	for(int ix = 0; ix<buffer.size(); ++ix)
+	{
+		if(buffer[ix].second%n)
+			flag = 1;
+	}
+	
 	for(int ix = 0; ix != buffer.size(); ++ix)
 	{
 		//cout<<buffer[ix].first<<" "<<buffer[ix].nums<<endl;
 		int row = 0;
-		int flag = 0;
-		for(int xxx = 0; xxx<buffer.size(); ++xxx)
-		{
-			if(buffer[xxx].second%n)
-				flag = 1;
-		}
 		if(!flag)
 		{
 			row = buffer[ix].second/n;
@@ -157,28 +149,33 @@ void deal_pairs(vector<pair<int, int> > &buffer, int n, int sum)
 				{
 					if(ix == buffer.size() -1)
 					{
-						cout<<0<<" "<<buffer[ix].second<<endl;
+						//cout<<0<<" "<<buffer[ix].second<<endl;
+						add_res(res, buffer[ix].first, buffer[ix].second);
 						break;
 					}
 					else
-						cout<<0<<" "<<n*(row-1)<<endl;
+					{
+						//cout<<0<<" "<<n*(row-1)<<endl;
+						add_res(res, 0, n*(row-1));
+						add_res(res, fabs(buffer[ix].first - buffer[ix+1].first), n);
+					}
 				}
 				else
 				{
-					cout<<fabs(buffer[ix].first - buffer[ix-1].first)<<" "<<2*n<<endl;
+					//cout<<fabs(buffer[ix].first - buffer[ix-1].first)<<" "<<n<<endl;
+					add_res(res, fabs(buffer[ix].first - buffer[ix-1].first), n);
 					if(row>2)
 					{
 						if(ix == buffer.size() -1)
 						{
-							//num = 0;
-							//nums += n*(row-1);
-							cout<<0<<" "<<n*(row-1)<<endl;
+							//cout<<0<<" "<<n*(row-1)<<endl;
+							add_res(res, 0, n*(row-1));
 						}
 						else
 						{
-							//num = 0;
-							//nums += n*(row-2);
-							cout<<0<<" "<<n*(row-2)<<endl;
+							//cout<<0<<" "<<n*(row-2)<<endl;
+							add_res(res, 0, n*(row-2));
+							add_res(res, fabs(buffer[ix].first - buffer[ix+1].first), n);
 						}	
 					}
 				}
@@ -189,16 +186,14 @@ void deal_pairs(vector<pair<int, int> > &buffer, int n, int sum)
 				{
 					if(ix == buffer.size() -1)
 					{
-						pre_num = num = buffer[ix].first;
-						nums += n;
 						//cout<<buffer[ix].first<<n<<endl;
+						add_res(res, buffer[ix].first, n);
 						break;
 					}
 					else
 					{
-						pre_num = num = fabs(buffer[ix].first - buffer[ix+1].first);
-						nums += n;
 						//cout<<fabs(buffer[ix].first - buffer[ix+1].first)<<" "<<n<<endl;
+						add_res(res, fabs(buffer[ix].first - buffer[ix+1].first), n);
 					}
 				}
 				else
@@ -208,23 +203,15 @@ void deal_pairs(vector<pair<int, int> > &buffer, int n, int sum)
 					{
 						if(max < fabs(buffer[ix].first - buffer[ix+1].first))
 							max = fabs(buffer[ix].first - buffer[ix+1].first);
-						num = max;
-						nums += n;
 						//cout<<max<<" "<<n<<endl;
+						add_res(res, max, n);
 					}
 					else
 					{
-						num = fabs(buffer[ix].first - buffer[ix-1].first);
-						nums += n;
 						//cout<<fabs(buffer[ix].first - buffer[ix-1].first)<<" "<<n<<endl;
+						add_res(res, fabs(buffer[ix].first - buffer[ix-1].first), n);
 					}
 				}
-			}
-			if(num!=pre_num)
-			{
-				cout<<pre_num<<" "<<nums<<endl;
-				pre_num = num;
-				nums = 0;
 			}
 			continue;
 		}
@@ -252,7 +239,8 @@ void deal_pairs(vector<pair<int, int> > &buffer, int n, int sum)
 			num = getmax2(buffer, n, sum, t_index);
 			if(num!=pre_num)
 			{
-				cout<<pre_num<<" "<<nums<<endl;
+				//cout<<pre_num<<" "<<nums<<endl;
+				add_res(res, pre_num, nums);
 				pre_num = num;
 				nums = 0;
 			}
@@ -261,7 +249,10 @@ void deal_pairs(vector<pair<int, int> > &buffer, int n, int sum)
 		}
 	}
 	if(nums)
-		cout<<pre_num<<" "<<nums<<endl;
+	{
+		//cout<<pre_num<<" "<<nums<<endl;
+		add_res(res, pre_num, nums);
+	}
 }
 		
 int main()
@@ -274,6 +265,7 @@ int main()
 			break;
 		cout<<n<<endl;
 		vector<pair<int, int> > buffer;
+		vector<pair<int, int> > res;
 		int nums = 0;
 		int num = 0;
 		int sum = 0;
@@ -284,11 +276,16 @@ int main()
 			sum += nums;
 			buffer.push_back(make_pair(num, nums));
 		}
-		//debug_p_pairs(buffer, n);
-		//debug_p_bitmap(buffer, n, sum);
-		deal_pairs(buffer, n, sum);
-		cout<<0<<" "<<0<<endl;
-
+		if(sum == 1)
+		{
+			cout<<buffer[0].first<<" "<<buffer[0].second<<endl;
+		}
+		else
+		{
+			deal_pairs(buffer, res, n, sum);
+			print_res(res);
+		}
+		cout<<"0 0"<<endl;
 	}
 	cout<<0<<endl;
 	return 0;
