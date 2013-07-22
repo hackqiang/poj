@@ -136,34 +136,50 @@ void deal_pairs(vector<pair<int, int> > &buffer, int n, int sum)
 {
 	int t_index = 0;
 	int num = 0;
-	int pre_num = getmax2(buffer, n, sum, t_index);
+	int pre_num = getmax2(buffer, n, sum, 0);
 	int nums = 0;
 	for(int ix = 0; ix != buffer.size(); ++ix)
 	{
 		//cout<<buffer[ix].first<<" "<<buffer[ix].nums<<endl;
 		int row = 0;
-		if(!(buffer[ix].second%n))
+		int flag = 0;
+		for(int xxx = 0; xxx<buffer.size(); ++xxx)
+		{
+			if(buffer[xxx].second%n)
+				flag = 1;
+		}
+		if(!flag)
 		{
 			row = buffer[ix].second/n;
-			if(row != 1)
+			if(row > 1)
 			{
 				if(ix == 0)
 				{
-					cout<<0<<" "<<n*(row-1)<<endl;
-				}
-				else if(ix == buffer.size() -1)
-				{
-					cout<<fabs(buffer[ix].first - buffer[ix-1].first)<<" "<<n<<endl;
+					if(ix == buffer.size() -1)
+					{
+						cout<<0<<" "<<buffer[ix].second<<endl;
+						break;
+					}
+					else
+						cout<<0<<" "<<n*(row-1)<<endl;
 				}
 				else
 				{
-					int max = fabs(buffer[ix].first - buffer[ix-1].first);
-					if(max < fabs(buffer[ix].first - buffer[ix+1].first))
-						max = fabs(buffer[ix].first - buffer[ix+1].first);
-					cout<<max<<" "<<n<<endl;
-					if(row!=2)
+					cout<<fabs(buffer[ix].first - buffer[ix-1].first)<<" "<<2*n<<endl;
+					if(row>2)
 					{
-						cout<<0<<" "<<n*(row-2)<<endl;
+						if(ix == buffer.size() -1)
+						{
+							//num = 0;
+							//nums += n*(row-1);
+							cout<<0<<" "<<n*(row-1)<<endl;
+						}
+						else
+						{
+							//num = 0;
+							//nums += n*(row-2);
+							cout<<0<<" "<<n*(row-2)<<endl;
+						}	
 					}
 				}
 			}
@@ -171,12 +187,44 @@ void deal_pairs(vector<pair<int, int> > &buffer, int n, int sum)
 			{
 				if(ix == 0)
 				{
-					continue;
+					if(ix == buffer.size() -1)
+					{
+						pre_num = num = buffer[ix].first;
+						nums += n;
+						//cout<<buffer[ix].first<<n<<endl;
+						break;
+					}
+					else
+					{
+						pre_num = num = fabs(buffer[ix].first - buffer[ix+1].first);
+						nums += n;
+						//cout<<fabs(buffer[ix].first - buffer[ix+1].first)<<" "<<n<<endl;
+					}
 				}
 				else
 				{
-					cout<<fabs(buffer[ix].first - buffer[ix-1].first)<<" "<<n<<endl;
+					int max = fabs(buffer[ix].first - buffer[ix-1].first);
+					if(ix != buffer.size() -1)
+					{
+						if(max < fabs(buffer[ix].first - buffer[ix+1].first))
+							max = fabs(buffer[ix].first - buffer[ix+1].first);
+						num = max;
+						nums += n;
+						//cout<<max<<" "<<n<<endl;
+					}
+					else
+					{
+						num = fabs(buffer[ix].first - buffer[ix-1].first);
+						nums += n;
+						//cout<<fabs(buffer[ix].first - buffer[ix-1].first)<<" "<<n<<endl;
+					}
 				}
+			}
+			if(num!=pre_num)
+			{
+				cout<<pre_num<<" "<<nums<<endl;
+				pre_num = num;
+				nums = 0;
 			}
 			continue;
 		}
@@ -187,7 +235,7 @@ void deal_pairs(vector<pair<int, int> > &buffer, int n, int sum)
 				nums += buffer[ix].second - 2*n -3;
 				t_index += buffer[ix].second - 2*n -3;
 				i += buffer[ix].second - 2*n -4;
-				cout<<"yyyyyy"<<ix<<" i"<<i<<endl;
+				//cout<<"yyyyyy"<<ix<<" i"<<i<<endl;
 				continue;
 			}
 			if(i == buffer[ix].second - n +1)
@@ -197,7 +245,7 @@ void deal_pairs(vector<pair<int, int> > &buffer, int n, int sum)
 					nums += n-1;
 					t_index += n-1;
 					i += n-2;
-					cout<<"xxxx"<<ix<<" i"<<i<<endl;
+					//cout<<"xxxx"<<ix<<" i"<<i<<endl;
 					continue;
 				}
 			}
@@ -212,7 +260,8 @@ void deal_pairs(vector<pair<int, int> > &buffer, int n, int sum)
 			t_index++;
 		}
 	}
-	cout<<pre_num<<" "<<nums<<endl;
+	if(nums)
+		cout<<pre_num<<" "<<nums<<endl;
 }
 		
 int main()
