@@ -4,26 +4,21 @@
 
 using namespace std;
 
-typedef struct _pairs
-{
-	int num;
-	int nums;
-} pairs;
-
-int getdata(vector<pairs> buffer, int n, int index);
-int getmax2(vector<pairs> buffer, int n, int sum, int index);
+int getdata(vector<pair<int, int> > &buffer, int n, int index);
+int getmax2(vector<pair<int, int> > &buffer, int n, int sum, int index);
 
 
-void debug_p_pairs(vector<pairs> buffer, int n)
+void debug_p_pairs(vector<pair<int, int> > &buffer, int n)
 {
 	cout<<n<<endl;
-	for(vector<pairs>::size_type ix = 0; ix != buffer.size(); ++ix)
+	int ix = 0;
+	for(ix = 0; ix != buffer.size(); ++ix)
 	{
-		cout<<buffer[ix].num<<" "<<buffer[ix].nums<<endl;
+		cout<<buffer[ix].first<<" "<<buffer[ix].second<<endl;
 	}
 }
 
-void debug_p_bitmap(vector<pairs> buffer, int n, int sum)
+void debug_p_bitmap(vector<pair<int, int> > &buffer, int n, int sum)
 {
 	for(int i =0;i<sum;i++)
 	{
@@ -40,21 +35,22 @@ void debug_p_bitmap(vector<pairs> buffer, int n, int sum)
 }
 
 
-int getdata(vector<pairs> buffer, int n, int index)
+int getdata(vector<pair<int, int> > &buffer, int n, int index)
 {
 	int sum = 0;
-	vector<pairs>::size_type ix = 0;
+	int ix = 0;
 	while( ix != buffer.size() && sum < index+1)
 	{
-		sum += buffer[ix].nums;
+		sum += buffer[ix].second;
 		++ix;
 	}
-	return buffer[ix-1].num;	
+	return buffer[ix-1].first;	
 }
 
 
-int getmax2(vector<pairs> buffer, int n, int sum, int index)
+int getmax2(vector<pair<int, int> > &buffer, int n, int sum, int index)
 {
+	//return 0;  //still timeout???
 	int max = 0;
 	int top = index, pre = index, next = index, bom = index;
 	int toppre = index, topnext = index, bompre = index, bomnext = index;
@@ -78,56 +74,56 @@ int getmax2(vector<pairs> buffer, int n, int sum, int index)
 	int data = getdata(buffer, n, index);
 	int t_sum1 = 0;
 	int t_sum2 = 0;
-	for(vector<pairs>::size_type ix = 0; ix != buffer.size(); ++ix)
+	for(vector<pair<int, int> >::size_type ix = 0; ix != buffer.size(); ++ix)
 	{
-		//cout<<buffer[ix].num<<" "<<buffer[ix].nums<<endl;
-		t_sum2 = t_sum1 + buffer[ix].nums;
+		//cout<<buffer[ix].first<<" "<<buffer[ix].second<<endl;
+		t_sum2 = t_sum1 + buffer[ix].second;
 		if(toppre!=index && toppre+1>=t_sum1 && toppre+1<=t_sum2)
 		{
-			if( max < fabs(buffer[ix].num - data))
-				max = fabs(buffer[ix].num - data);
+			if( max < fabs(buffer[ix].first - data))
+				max = fabs(buffer[ix].first - data);
 			toppre = index;
 		}
 		if(top!=index && top+1>=t_sum1 && top+1<=t_sum2)
 		{
-			if( max < fabs(buffer[ix].num - data))
-				max = fabs(buffer[ix].num - data);
+			if( max < fabs(buffer[ix].first - data))
+				max = fabs(buffer[ix].first - data);
 			top = index;
 		}
 		if(topnext!=index && topnext+1>=t_sum1 && topnext+1<=t_sum2)
 		{
-			if( max < fabs(buffer[ix].num - data))
-				max = fabs(buffer[ix].num - data);
+			if( max < fabs(buffer[ix].first - data))
+				max = fabs(buffer[ix].first - data);
 			topnext = index;
 		}
 		if(pre!=index && pre+1>=t_sum1 && pre+1<=t_sum2)
 		{
-			if( max < fabs(buffer[ix].num - data))
-				max = fabs(buffer[ix].num - data);
+			if( max < fabs(buffer[ix].first - data))
+				max = fabs(buffer[ix].first - data);
 			pre = index;
 		}
 		if(next!=index && next+1>=t_sum1 && next+1<=t_sum2)
 		{
-			if( max < fabs(buffer[ix].num - data))
-				max = fabs(buffer[ix].num - data);
+			if( max < fabs(buffer[ix].first - data))
+				max = fabs(buffer[ix].first - data);
 			next = index;
 		}
 		if(bompre!=index && bompre+1>=t_sum1 && bompre+1<=t_sum2)
 		{
-			if( max < fabs(buffer[ix].num - data))
-				max = fabs(buffer[ix].num - data);
+			if( max < fabs(buffer[ix].first - data))
+				max = fabs(buffer[ix].first - data);
 			bompre = index;
 		}
 		if(bom!=index && bom+1>=t_sum1 && bom+1<=t_sum2)
 		{
-			if( max < fabs(buffer[ix].num - data))
-				max = fabs(buffer[ix].num - data);
+			if( max < fabs(buffer[ix].first - data))
+				max = fabs(buffer[ix].first - data);
 			bom = index;
 		}
 		if(bomnext!=index && bomnext+1>=t_sum1 && bomnext+1<=t_sum2)
 		{
-			if( max < fabs(buffer[ix].num - data))
-				max = fabs(buffer[ix].num - data);
+			if( max < fabs(buffer[ix].first - data))
+				max = fabs(buffer[ix].first - data);
 			bomnext = index;
 			break;
 		}
@@ -136,23 +132,74 @@ int getmax2(vector<pairs> buffer, int n, int sum, int index)
 	return max;
 }
 
-void deal_pairs(vector<pairs> buffer, int n, int sum)
+void deal_pairs(vector<pair<int, int> > &buffer, int n, int sum)
 {
 	int t_index = 0;
 	int num = 0;
 	int pre_num = getmax2(buffer, n, sum, t_index);
 	int nums = 0;
-	for(vector<pairs>::size_type ix = 0; ix != buffer.size(); ++ix)
+	for(int ix = 0; ix != buffer.size(); ++ix)
 	{
-		//cout<<buffer[ix].num<<" "<<buffer[ix].nums<<endl;
-		for(int i = 0; i<buffer[ix].nums; i++)
+		//cout<<buffer[ix].first<<" "<<buffer[ix].nums<<endl;
+		int row = 0;
+		if(!(buffer[ix].second%n))
 		{
-			if(i==n+2 && buffer[ix].nums>= 2*n+3)
+			row = buffer[ix].second/n;
+			if(row != 1)
 			{
-				nums += buffer[ix].nums - 2*n - 2;
-				t_index += buffer[ix].nums - 2*n - 2;
-				i = buffer[ix].nums - n -1;
+				if(ix == 0)
+				{
+					cout<<0<<" "<<n*(row-1)<<endl;
+				}
+				else if(ix == buffer.size() -1)
+				{
+					cout<<fabs(buffer[ix].first - buffer[ix-1].first)<<" "<<n<<endl;
+				}
+				else
+				{
+					int max = fabs(buffer[ix].first - buffer[ix-1].first);
+					if(max < fabs(buffer[ix].first - buffer[ix+1].first))
+						max = fabs(buffer[ix].first - buffer[ix+1].first);
+					cout<<max<<" "<<n<<endl;
+					if(row!=2)
+					{
+						cout<<0<<" "<<n*(row-2)<<endl;
+					}
+				}
+			}
+			else if(row == 1)
+			{
+				if(ix == 0)
+				{
+					continue;
+				}
+				else
+				{
+					cout<<fabs(buffer[ix].first - buffer[ix-1].first)<<" "<<n<<endl;
+				}
+			}
+			continue;
+		}
+		for(int i = 0; i<buffer[ix].second; i++)
+		{
+			if(i==n+2 && buffer[ix].second> 2*n+4)
+			{
+				nums += buffer[ix].second - 2*n -3;
+				t_index += buffer[ix].second - 2*n -3;
+				i += buffer[ix].second - 2*n -4;
+				cout<<"yyyyyy"<<ix<<" i"<<i<<endl;
 				continue;
+			}
+			if(i == buffer[ix].second - n +1)
+			{
+				if(ix < buffer.size()-1 && buffer[ix].second>=n && buffer[ix+1].second>=n)
+				{
+					nums += n-1;
+					t_index += n-1;
+					i += n-2;
+					cout<<"xxxx"<<ix<<" i"<<i<<endl;
+					continue;
+				}
 			}
 			num = getmax2(buffer, n, sum, t_index);
 			if(num!=pre_num)
@@ -177,7 +224,7 @@ int main()
 		if(n == 0)
 			break;
 		cout<<n<<endl;
-		vector<pairs> buffer;
+		vector<pair<int, int> > buffer;
 		int nums = 0;
 		int num = 0;
 		int sum = 0;
@@ -186,8 +233,7 @@ int main()
 			if(num == 0 && nums == 0)
 				break;
 			sum += nums;
-			pairs data = {num, nums};
-			buffer.push_back(data);
+			buffer.push_back(make_pair(num, nums));
 		}
 		//debug_p_pairs(buffer, n);
 		//debug_p_bitmap(buffer, n, sum);
