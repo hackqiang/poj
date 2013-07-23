@@ -112,7 +112,10 @@ void add_res(vector<pair<int, int> > &res, int num, int nums)
 	if(res[res.size()-1].first == num)
 		res[res.size()-1].second += nums;
 	else
-		res.push_back(make_pair(num,nums));
+	{
+		if(nums)
+			res.push_back(make_pair(num,nums));
+	}
 }
 
 void print_res(vector<pair<int, int> > &res)
@@ -150,7 +153,7 @@ void deal_pairs(vector<pair<int, int> > &buffer, vector<pair<int, int> > &res, i
 					if(ix == buffer.size() -1)
 					{
 						//cout<<0<<" "<<buffer[ix].second<<endl;
-						add_res(res, buffer[ix].first, buffer[ix].second);
+						add_res(res, 0, buffer[ix].second);
 						break;
 					}
 					else
@@ -164,20 +167,17 @@ void deal_pairs(vector<pair<int, int> > &buffer, vector<pair<int, int> > &res, i
 				{
 					//cout<<fabs(buffer[ix].first - buffer[ix-1].first)<<" "<<n<<endl;
 					add_res(res, fabs(buffer[ix].first - buffer[ix-1].first), n);
-					if(row>2)
+					if(ix == buffer.size() -1)
 					{
-						if(ix == buffer.size() -1)
-						{
-							//cout<<0<<" "<<n*(row-1)<<endl;
-							add_res(res, 0, n*(row-1));
-						}
-						else
-						{
-							//cout<<0<<" "<<n*(row-2)<<endl;
-							add_res(res, 0, n*(row-2));
-							add_res(res, fabs(buffer[ix].first - buffer[ix+1].first), n);
-						}	
+						//cout<<0<<" "<<n*(row-1)<<endl;
+						add_res(res, 0, n*(row-1));
 					}
+					else
+					{
+						//cout<<0<<" "<<n*(row-2)<<endl;
+						add_res(res, 0, n*(row-2));
+						add_res(res, fabs(buffer[ix].first - buffer[ix+1].first), n);
+					}	
 				}
 			}
 			else if(row == 1)
@@ -187,7 +187,7 @@ void deal_pairs(vector<pair<int, int> > &buffer, vector<pair<int, int> > &res, i
 					if(ix == buffer.size() -1)
 					{
 						//cout<<buffer[ix].first<<n<<endl;
-						add_res(res, buffer[ix].first, n);
+						add_res(res, 0, n);
 						break;
 					}
 					else
@@ -217,6 +217,7 @@ void deal_pairs(vector<pair<int, int> > &buffer, vector<pair<int, int> > &res, i
 		}
 		for(int i = 0; i<buffer[ix].second; i++)
 		{
+			#if 0
 			if(i==n+2 && buffer[ix].second> 2*n+4)
 			{
 				nums += buffer[ix].second - 2*n -3;
@@ -236,6 +237,7 @@ void deal_pairs(vector<pair<int, int> > &buffer, vector<pair<int, int> > &res, i
 					continue;
 				}
 			}
+			#endif
 			num = getmax2(buffer, n, sum, t_index);
 			if(num!=pre_num)
 			{
