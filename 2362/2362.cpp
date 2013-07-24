@@ -1,9 +1,10 @@
 #include <iostream>
 #include <algorithm>
+#include <string.h>
 
 using namespace std;
 
-#define MAX_SIZE 64
+#define MAX_SIZE 20
 
 int stick[MAX_SIZE];
 int visit[MAX_SIZE];
@@ -42,42 +43,41 @@ int dfs(int n, int len, int clen, int layer, int layers, int start)
 }
 
 
-int main()
+
+int main(void)
 {
-	int n = 0;
-	while(cin>>n)
-	{
-		if(n == 0)
-			break;
-		int sum = 0;
+    int t;
+    cin>>t;
+    while(t--)
+    {
+        memset(stick, 0, sizeof(stick));
+        memset(visit, 0, sizeof(visit));
+        int n, sum=0;
+        cin>>n;
+		int i = 0;
 		for(int i=0; i<n; i++)
 		{
 			cin>>stick[i];
 			sum += stick[i];
-			visit[i]  = 0;
 		}
-
-		sort(stick, stick+n, greater<int>());
-		int max_sticks = sum/stick[0];
-		int flag = 0;
-		while(max_sticks>1)
+        sort(stick, stick+n, greater<int>());
+        if(sum%4)
+        {
+            cout<<"no"<<endl;
+			continue;
+        }
+        if(stick[0]>sum/4)
+        {
+            cout<<"no"<<endl;
+			continue;
+        }
+		if(dfs(n,sum/4,0,0,4,0))
 		{
-			if(sum%max_sticks == 0)
-			{
-				int size = sum/max_sticks;
-				//cout<<"xx"<<size<<endl;
-				if(dfs(n, size, 0, 0, max_sticks, 0))
-				{
-					cout<<size<<endl;
-					flag = 1;
-					break;
-				}					
-			}
-			--max_sticks;
+			cout<<"yes"<<endl;
 		}
-		if(!flag)
-			cout<<sum<<endl;
-	}
-
-	return 0;
+		else
+		{
+			cout<<"no"<<endl;
+		}
+    }
 }
